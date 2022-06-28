@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: project
-          image: jammeri/project:0.2
+          image: jammeri/project:0.3
