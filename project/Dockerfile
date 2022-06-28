@@ -36,4 +36,6 @@ COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/project ./
 
 USER app:app
 
+EXPOSE 3000
+
 CMD ["/app/project"]

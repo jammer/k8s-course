@@ -12,6 +12,7 @@ fn random() -> String {
 
 #[get("/")]
 async fn hello(start: web::Data<String>) -> impl Responder {
+    println!("Request!");
     let resp = format!("Hello {} from {}",random(),start.get_ref());
     HttpResponse::Ok().body(resp)
 }
@@ -19,7 +20,7 @@ async fn hello(start: web::Data<String>) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let port : u16 = env::var("PORT").unwrap_or_else(|_| "8080".to_string())
+    let port : u16 = env::var("PORT").unwrap_or_else(|_| "3000".to_string())
         .parse::<u16>().expect("Invalid PORT environment variable.");
     println!("Server started in port {}", port);
     HttpServer::new(|| {
@@ -27,7 +28,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(random()))
             .service(hello)
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("0.0.0.0", port))?
         .run()
         .await
 }

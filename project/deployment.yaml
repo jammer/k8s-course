@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: project
+  name: project-dep
 spec:
   replicas: 1
   selector:
@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
         - name: project
-          image: jammeri/project:0.3
+          image: jammeri/project:0.34
