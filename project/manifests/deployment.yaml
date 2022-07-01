@@ -12,6 +12,14 @@ spec:
       labels:
         app: project
     spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: project-claim
       containers:
         - name: project
-          image: jammeri/project:0.34
+          image: jammeri/project:0.62
+          volumeMounts:
+            - name: data
+              mountPath: /data
+
