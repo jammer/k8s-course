@@ -12,6 +12,17 @@ spec:
       labels:
         app: logger
     spec:
+      volumes:
+        - name: data
+          emptyDir: {}
       containers:
-        - name: logger
-          image: jammeri/logger:0.2
+        - name: logger-writer
+          image: jammeri/logger:writer
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - name: logger-web
+          image: jammeri/logger:web
+          volumeMounts:
+            - name: data
+              mountPath: /data

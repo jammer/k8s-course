@@ -25,15 +25,29 @@ COPY ./ .
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
 ## Final image
-FROM scratch
+FROM scratch as web
 
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
 WORKDIR /app
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/logger ./
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/web ./
 
 USER app:app
 
-CMD ["/app/logger"]
+CMD ["/app/web"]
+
+## Final image
+FROM scratch as writer
+
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /app
+
+COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/writer ./
+
+USER app:app
+
+CMD ["/app/writer"]

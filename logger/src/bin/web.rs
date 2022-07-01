@@ -1,12 +1,12 @@
-use chrono::prelude::*;
 use uuid::Uuid;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use std::env;
+use std::fs;
 
 #[get("/")]
 async fn hello(start: web::Data<Uuid>) -> impl Responder {
-    let time = Utc::now();
-    let resp = format!("{:?} {}",time,start.get_ref());
+    let time = fs::read_to_string("/data/time.txt").unwrap_or_else(|_| "fail".to_string());
+    let resp = format!("{} {}",time.trim(),start.get_ref());
     println!("{}",resp);
     HttpResponse::Ok().body(resp)
 }
