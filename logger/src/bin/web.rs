@@ -5,10 +5,11 @@ use std::fs;
 
 #[get("/")]
 async fn hello(start: web::Data<Uuid>) -> impl Responder {
-    let time = fs::read_to_string("/data/time.txt").unwrap_or_else(|_| "fail".to_string());
+    let time = fs::read_to_string("/data/time.txt").unwrap_or_else(|_| "".to_string());
     let resp = format!("{} {}",time.trim(),start.get_ref());
+    let counter = fs::read_to_string("/data/pong.txt").unwrap_or_else(|_| "0".to_string());
     println!("{}",resp);
-    HttpResponse::Ok().body(resp)
+    HttpResponse::Ok().body(resp + "\nPing / Pongs: " + &counter)
 }
 
 

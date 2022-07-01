@@ -14,15 +14,16 @@ spec:
     spec:
       volumes:
         - name: data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: project-claim
       containers:
         - name: logger-writer
-          image: jammeri/logger:writer
+          image: jammeri/logger:writer2
           volumeMounts:
             - name: data
               mountPath: /data
         - name: logger-web
-          image: jammeri/logger:web
+          image: jammeri/logger:web2
           volumeMounts:
             - name: data
               mountPath: /data

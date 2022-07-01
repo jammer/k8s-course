@@ -1,13 +1,12 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
-use rand::{distributions::Alphanumeric, Rng};
-use std::sync::atomic::{AtomicUsize, Ordering};
-
-static COUNTER: AtomicUsize = AtomicUsize::new(0);
+use std::fs;
 
 #[get("/pingpong")]
 async fn hello() -> impl Responder {
-    let counter = COUNTER.fetch_add(1, Ordering::SeqCst);
+    let mut counter:u64 = fs::read_to_string("/data/pong.txt").unwrap_or_else(|_| "0".to_string()).trim().parse().unwrap();
+    counter += 1;
+    fs::write("/data/pong.txt",counter.to_string()).unwrap();
     let resp = format!("Pong {}",counter);
     HttpResponse::Ok().body(resp)
 }

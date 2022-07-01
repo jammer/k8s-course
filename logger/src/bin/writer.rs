@@ -7,7 +7,7 @@ fn main() -> std::io::Result<()> {
         let time = Utc::now();
         let resp = format!("{:?}",time);
         println!("{:?}",resp);
-        fs::write("/data/time.txt",resp + "\n")?;
+        let _ = fs::write("/data/time.txt",resp + "\n");
         let five_seconds = time::Duration::from_secs(5);
         thread::sleep(five_seconds);
     }
