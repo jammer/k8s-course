@@ -22,7 +22,16 @@ async fn hello(start: web::Data<String>) -> impl Responder {
         fs::write(file,bytes);
     }
     println!("Request!");
-    HttpResponse::Ok().insert_header(ContentType::html()).body("<img src=\"picture.jpg\">")
+    let html = r#"
+<img src="picture.jpg"><br>
+<input type="text" maxlength="140">
+<input type="button" value="Create TODO">
+<ul>
+	<li>Todo 1</li>
+	<li>Todo 2</li>
+</ul>
+"#;
+    HttpResponse::Ok().insert_header(ContentType::html()).body(html)
 }
 
 #[get("/picture.jpg")]
