@@ -12,13 +12,6 @@ spec:
       labels:
         app: pingpong
     spec:
-      volumes:
-        - name: project-store
-          persistentVolumeClaim:
-            claimName: project-claim
       containers:
         - name: pingpong
-          image: jammeri/pingpong:0.2
-          volumeMounts:
-            - name: project-store
-              mountPath: /data
+          image: jammeri/pingpong:1.0

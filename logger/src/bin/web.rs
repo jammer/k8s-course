@@ -7,7 +7,7 @@ use std::fs;
 async fn hello(start: web::Data<Uuid>) -> impl Responder {
     let time = fs::read_to_string("/data/time.txt").unwrap_or_else(|_| "".to_string());
     let resp = format!("{} {}",time.trim(),start.get_ref());
-    let counter = fs::read_to_string("/data/pong.txt").unwrap_or_else(|_| "0".to_string());
+    let counter = reqwest::get("http://pingpong-svc/pong").await.unwrap().text().await.unwrap();
     println!("{}",resp);
     HttpResponse::Ok().body(resp + "\nPing / Pongs: " + &counter)
 }

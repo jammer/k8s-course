@@ -18,12 +18,12 @@ spec:
             claimName: project-claim
       containers:
         - name: logger-writer
-          image: jammeri/logger:writer2
+          image: jammeri/logger:writer-1.0
           volumeMounts:
             - name: data
               mountPath: /data
         - name: logger-web
-          image: jammeri/logger:web2
+          image: jammeri/logger:web-1.1
           volumeMounts:
             - name: data
               mountPath: /data
