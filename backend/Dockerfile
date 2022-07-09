@@ -1,10 +1,5 @@
 FROM ubuntu:focal
 
-RUN apt-get update
-RUN apt-get install -y openssl libssl-dev ca-certificates curl
-RUN update-ca-certificates
-
-
 ENV USER=app
 ENV UID=10001
 
@@ -17,12 +12,13 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 
+
 WORKDIR /app
 
-COPY target/release/project ./
+COPY target/release/backend ./
 
 USER app:app
 
 EXPOSE 3000
 
-CMD ["/app/project"]
+CMD ["/app/backend"]

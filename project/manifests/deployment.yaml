@@ -17,8 +17,10 @@ spec:
           persistentVolumeClaim:
             claimName: project-claim
       containers:
-        - name: project
-          image: jammeri/project:0.62
+        - name: backend
+          image: jammeri/backend:1.4
+        - name: web
+          image: jammeri/project:1.21
           volumeMounts:
             - name: data
               mountPath: /data

@@ -12,4 +12,25 @@ spec:
           service:
             name: project-svc
             port:
-              number: 2345
+              number: 80
+      - path: /picture.jpg
+        pathType: Prefix
+        backend:
+          service:
+            name: project-svc
+            port:
+              number: 80
+      - path: /version
+        pathType: Prefix
+        backend:
+          service:
+            name: project-svc
+            port:
+              number: 80
+      - path: /todos
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-svc
+            port:
+              number: 80

@@ -22,7 +22,8 @@ WORKDIR /app
 
 COPY ./ .
 
-RUN cargo build --target x86_64-unknown-linux-musl --release
+#RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN cargo build --release
 
 ## Final image
 FROM scratch
@@ -32,7 +33,8 @@ COPY --from=builder /etc/group /etc/group
 
 WORKDIR /app
 
-COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/pingpong ./
+#COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/pingpong ./
+COPY --from=builder /app/target/release/pingpong ./
 
 USER app:app
 
