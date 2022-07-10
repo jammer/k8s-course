@@ -24,7 +24,13 @@ spec:
             - name: data
               mountPath: /data
         - name: logger-web
-          image: jammeri/logger:web-1.1
+          env:
+            - name: MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: logger-configmap
+                  key: message
+          image: jammeri/logger:web-1.2
           volumeMounts:
             - name: data
               mountPath: /data

@@ -9,7 +9,7 @@ async fn hello(start: web::Data<Uuid>) -> impl Responder {
     let resp = format!("{} {}",time.trim(),start.get_ref());
     let counter = reqwest::get("http://pingpong-svc/pong").await.unwrap().text().await.unwrap();
     println!("{}",resp);
-    HttpResponse::Ok().body(resp + "\nPing / Pongs: " + &counter)
+    HttpResponse::Ok().body(env::var("MESSAGE").unwrap_or_else(|_| "Message not set".to_string()) + "\n" + &resp + "\nPing / Pongs: " + &counter)
 }
 
 
