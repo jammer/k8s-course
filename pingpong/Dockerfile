@@ -1,8 +1,7 @@
-## Builder
-FROM rust:latest AS builder
+FROM ubuntu:focal
 
-RUN rustup target add x86_64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev
+RUN apt-get update
+RUN apt-get install -y openssl libssl-dev ca-certificates curl
 RUN update-ca-certificates
 
 ENV USER=app
@@ -17,24 +16,9 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 
-
 WORKDIR /app
 
-COPY ./ .
-
-#RUN cargo build --target x86_64-unknown-linux-musl --release
-RUN cargo build --release
-
-## Final image
-FROM scratch
-
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /etc/group /etc/group
-
-WORKDIR /app
-
-#COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/pingpong ./
-COPY --from=builder /app/target/release/pingpong ./
+COPY target/release/pingpong ./
 
 USER app:app
 

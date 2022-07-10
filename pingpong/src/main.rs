@@ -1,36 +1,54 @@
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use tokio_postgres::{NoTls, Error};
 
-static COUNTER: AtomicUsize = AtomicUsize::new(0);
+async fn db(increase : bool) -> Result<i64, Error> {
+  let server = env::var("SERVER").unwrap();
+  let (client, connection) = tokio_postgres::connect(&server, NoTls).await?;
+
+  tokio::spawn(async move {
+    if let Err(e) = connection.await {
+      eprintln!("connection error: {}", e);
+    }
+  });
+  
+  let query = "CREATE TABLE IF NOT EXISTS pingpong (id SERIAL PRIMARY KEY)";
+  client.batch_execute(query).await?;
+
+  if increase {
+    let query = "INSERT INTO pingpong(id) VALUES(DEFAULT)";
+    client.batch_execute(query).await?;
+  }
+  let rows = client.query("SELECT COUNT(id) FROM pingpong",&[]).await?;
+  let value : i64 = rows[0].get(0);
+  Ok(value)
+}
 
 #[get("/pingpong")]
 async fn pingpong() -> impl Responder {
-    let counter = COUNTER.fetch_add(1, Ordering::SeqCst);
-    let resp = format!("Pong {}",counter);
-    HttpResponse::Ok().body(resp)
+  let resp = format!("Pong {}",db(true).await.unwrap());
+  HttpResponse::Ok().body(resp)
 }
 
 #[get("/pong")]
 async fn pong() -> impl Responder {
-    let counter = COUNTER.load(Ordering::SeqCst);
-    let resp = format!("{}",counter);
-    HttpResponse::Ok().body(resp)
+  let resp = format!("{}",db(false).await.unwrap());
+  HttpResponse::Ok().body(resp)
 }
 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let port : u16 = env::var("PORT").unwrap_or_else(|_| "3000".to_string())
-        .parse::<u16>().expect("Invalid PORT environment variable.");
-    println!("Server started in port {}", port);
-    HttpServer::new(|| {
-        App::new()
-            .service(pingpong)
-            .service(pong)
+  let port : u16 = env::var("PORT").unwrap_or_else(|_| "3000".to_string())
+    .parse::<u16>().expect("Invalid PORT environment variable.");
+  println!("Server started in port {}", port);
+  HttpServer::new(|| {
+    App::new()
+      .service(pingpong)
+      .service(pong)
     })
-    .bind(("0.0.0.0", port))?
-        .run()
-        .await
+  .bind(("0.0.0.0", port))?
+    .run()
+    .await
 }
 
