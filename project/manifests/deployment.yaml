@@ -19,7 +19,13 @@ spec:
             claimName: project-claim
       containers:
         - name: backend
-          image: jammeri/backend:1.4
+          image: jammeri/backend:1.7
+          env:
+           - name: SERVER
+             valueFrom:
+               secretKeyRef:
+                 name: dburl
+                 key: server
         - name: web
           image: jammeri/project:1.21
           volumeMounts:
