@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wikipedia-cron
+  namespace: project
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: wikipedia
+            image: jammeri/cron:1.0
+            imagePullPolicy: IfNotPresent
+          restartPolicy: OnFailure
