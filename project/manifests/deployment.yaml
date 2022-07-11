@@ -19,7 +19,7 @@ spec:
             claimName: project-claim
       containers:
         - name: backend
-          image: jammeri/backend:1.7
+          image: jammeri/backend:1.8
           env:
            - name: SERVER
              valueFrom:
