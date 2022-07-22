@@ -4,7 +4,7 @@ metadata:
   name: logger-svc
   namespace: pingpong
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: logger
   ports:

@@ -36,6 +36,10 @@ async fn pong() -> impl Responder {
   HttpResponse::Ok().body(resp)
 }
 
+#[get("/")]
+async fn base() -> impl Responder {
+  HttpResponse::Ok().body("Pingpong")
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -46,6 +50,7 @@ async fn main() -> std::io::Result<()> {
     App::new()
       .service(pingpong)
       .service(pong)
+      .service(base)
     })
   .bind(("0.0.0.0", port))?
     .run()

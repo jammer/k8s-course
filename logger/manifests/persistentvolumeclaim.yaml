@@ -4,7 +4,6 @@ metadata:
   name: logger-claim
   namespace: pingpong
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
