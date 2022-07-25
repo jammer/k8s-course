@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- manifests/deployment.yaml
+- manifests/service.yaml
+- manifests/service-backend.yaml
+- manifests/ingress.yaml
+- manifests/secret.enc.yaml
+images:
+- name: IMAGEBACKEND
+  newName: jammeri/backend
+- name: IMAGEFRONTEND
+  newName: jammeri/project
+- name: jammeri/backend
+  newName: gcr.io//-backend
+  newTag: '-'
+- name: jammeri/project
+  newName: gcr.io//
+  newTag: '-'

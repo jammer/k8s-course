@@ -1,28 +1,24 @@
-FROM ubuntu:focal
-
-RUN apt-get update
-RUN apt-get install -y openssl libssl-dev ca-certificates curl
-RUN update-ca-certificates
-
-
-ENV USER=app
-ENV UID=10001
-
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    "${USER}"
-
+# BUILDER
+FROM rust:latest as builder
+# Install dependencies first for caching purposes
+RUN cargo install cargo-build-dependencies
+RUN cargo new app
 WORKDIR /app
+COPY Cargo.toml Cargo.lock /app/
+RUN cargo build-dependencies
 
-COPY target/release/project ./
+# Build
+COPY src /app/src
+RUN cargo build
 
-USER app:app
+# BACKEND
+FROM jammeri/debian:bullseye as backend
+WORKDIR /app
+COPY --from=builder /app/target/debug/backend /app/
+CMD ["/app/backend"]
 
-EXPOSE 3000
-
-CMD ["/app/project"]
+# FRONTEND
+FROM jammeri/debian:bullseye as frontend
+WORKDIR /app
+COPY --from=builder /app/target/debug/frontend /app/
+CMD ["/app/frontend"]

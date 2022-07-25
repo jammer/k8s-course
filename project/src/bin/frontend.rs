@@ -2,6 +2,7 @@ use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use std::env;
 use std::fs;
 use actix_web::http::header::ContentType;
+//use std::error::Error;
 
 #[get("/version")]
 async fn version() -> impl Responder {
@@ -23,16 +24,18 @@ async fn hello() -> impl Responder {
         let bytes = req.unwrap().bytes().await.unwrap();
         match fs::write(file,bytes) {
             Ok(_) => println!("Wrote new image {:?}",file),
-            Err(_) => println!("Error writing file, permissions?"),
+            Err(e) => println!("Error writing file: {:?}",e),
         }
     } else {
         println!("Already have picture {:?}",file);
     }
-    println!("Request!");
     let req = reqwest::get("http://backend-svc/todos").await;
     match req {
         Ok(_) => {}
-        Err(_) => { println!("Error fetching todos"); panic!("Error fetching todos") }
+        Err(e) => { 
+            println!("Error fetching todos");
+            return HttpResponse::InternalServerError().insert_header(ContentType::html()).body(format!("Error fetching todos: <br> {e:?}")); 
+        }
     }
     let json = req.unwrap().json::<Vec<String>>().await.unwrap();
     let mut html = r#"

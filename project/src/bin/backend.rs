@@ -5,13 +5,12 @@ use actix_web::{web, get, post, App, HttpResponse, HttpServer, Responder};
 use serde::Deserialize;
 use tokio_postgres::{NoTls, Error};
 
-#[get("/version")]
+#[get("/")]
 async fn version() -> impl Responder {
   HttpResponse::Ok().body("Backend")
 }
 
-async fn get_todos_db() -> Result<Vec<String>,Error> {
-  let server = env::var("SERVER").unwrap();
+async fn get_todos_db(server: &String) -> Result<Vec<String>,Error> {
   let (client, connection) = tokio_postgres::connect(&server, NoTls).await?;
 
   tokio::spawn(async move {
@@ -32,8 +31,7 @@ async fn get_todos_db() -> Result<Vec<String>,Error> {
   Ok(todos)
 }
 
-async fn post_todos_db(todo: &String) -> Result<(),Error> {
-  let server = env::var("SERVER").unwrap();
+async fn post_todos_db(server: &String, todo: &String) -> Result<(),Error> {
   let (client, connection) = tokio_postgres::connect(&server, NoTls).await?;
 
   tokio::spawn(async move {
@@ -51,9 +49,18 @@ async fn post_todos_db(todo: &String) -> Result<(),Error> {
 
 #[get("/todos")]
 async fn get_todos() -> impl Responder {
-  println!("Fetching todos!");
-  let todos = get_todos_db().await.unwrap();
-  HttpResponse::Ok().json(&todos.deref())
+  if let Ok(server) = env::var("SERVER") {
+    println!("Fetching todos!");
+    match get_todos_db(&server).await {
+        Ok(todos) => {
+            return HttpResponse::Ok().json(&todos.deref());
+        }
+        Err(e) => {
+            return HttpResponse::InternalServerError().body(format!("DATABASE ERROR\n{e:#?}"));
+        }
+    }
+  }
+  else { return HttpResponse::InternalServerError().body("SERVER variable not set"); }
 }
 
 #[derive(Deserialize)]
@@ -63,17 +70,20 @@ todo: String,
 
 #[post("/todos")]
 async fn post_todos(form: web::Form<FormData>) -> impl Responder {
-  if form.todo.len() > 140 {
-      println!("Todo length was longer than 140!");
-      return HttpResponse::InternalServerError().body("Todo max length is 140!");
+  if let Ok(server) = env::var("SERVER") {
+      if form.todo.len() > 140 {
+          println!("Todo length was longer than 140!");
+          return HttpResponse::InternalServerError().body("Todo max length is 140!");
+      }
+      match post_todos_db(&server, &form.todo).await {
+        Ok(_) => return HttpResponse::Ok().body(format!("Added todo: {}",form.todo)),
+        Err(e) => {
+          println!("Todo adding failed! {:?}",e);
+          return HttpResponse::InternalServerError().body(format!("Todo not added!\n{:#?}",e));
+        }
+      }
   }
-  match post_todos_db(&form.todo).await {
-    Ok(_) => return HttpResponse::Ok().body(format!("Added todo: {}",form.todo)),
-    Err(e) => {
-      println!("Todo adding failed! {:?}",e);
-      return HttpResponse::InternalServerError().body("Todo not added!");
-    }
-  }
+  else { return HttpResponse::InternalServerError().body("SERVER variable not set"); }
 }
 
 #[actix_web::main]

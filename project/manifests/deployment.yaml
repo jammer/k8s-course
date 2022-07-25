@@ -19,7 +19,7 @@ spec:
             claimName: project-claim
       containers:
         - name: backend
-          image: jammeri/backend:1.8
+          image: IMAGEBACKEND
           env:
            - name: SERVER
              valueFrom:
@@ -27,7 +27,7 @@ spec:
                  name: dburl
                  key: server
         - name: web
-          image: jammeri/project:1.21
+          image: IMAGEFRONTEND
           volumeMounts:
             - name: data
               mountPath: /data
