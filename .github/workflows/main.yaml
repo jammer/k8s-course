@@ -74,10 +74,10 @@ jobs:
       # Deploy the Docker image to the GKE cluster
       - name: Deploy
         run: |-
-          kubectl create namespace project || true
+          kubectl create namespace ${GITHUB_REF#refs/heads/} || true
           sops --decrypt --in-place manifests/secret.enc.yaml
-          kustomize edit set namespace project
-          kubectl config set-context --current --namespace=project
+          kustomize edit set namespace ${GITHUB_REF#refs/heads/}
+          kubectl config set-context --current --namespace=${GITHUB_REF#refs/heads/}
           kustomize edit set image jammeri/project=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize edit set image jammeri/backend=gcr.io/$PROJECT_ID/$IMAGE-backend:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
           kustomize build . | kubectl apply -f -

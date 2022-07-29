@@ -11,9 +11,3 @@ images:
   newName: jammeri/backend
 - name: IMAGEFRONTEND
   newName: jammeri/project
-- name: jammeri/backend
-  newName: gcr.io//-backend
-  newTag: '-'
-- name: jammeri/project
-  newName: gcr.io//
-  newTag: '-'
