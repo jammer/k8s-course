@@ -6,6 +6,7 @@ resources:
 - manifests/service-backend.yaml
 - manifests/ingress.yaml
 - manifests/secret.enc.yaml
+- manifests/persistentvolumeclaim.yaml
 images:
 - name: IMAGEBACKEND
   newName: jammeri/backend

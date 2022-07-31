@@ -1,0 +1,63 @@
+name: Delete environment when branch deleted
+
+on:
+  delete:
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_CLUSTER: dwk-cluster
+  GKE_ZONE: europe-north1-b
+  IMAGE: project
+  SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+  DOCKER_BUILDKIT: 1
+
+defaults:
+  run:
+    working-directory: project
+
+jobs:
+  delete:
+    if: github.event.ref_type == 'branch'
+    name: Setup and Delete
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@main
+        with:
+          project_id: ${{ secrets.GKE_PROJECT }}
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          export_default_credentials: true
+
+      # Configure Docker to use the gcloud command-line tool as a credential
+      # helper for authentication
+      - run: |-
+          gcloud --quiet auth configure-docker
+      # Get the GKE credentials so we can deploy to the cluster
+      - run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      # Set up kustomize
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v1
+
+      # Set up sops
+      - name: Sops Binary Installer
+        uses: mdgreenwald/mozilla-sops-action@v1.2.0
+        id: install
+
+      - name: Delete
+        run: |-
+          echo "Deleting branch ${{ github.event.ref }}"
+          kubectl create namespace ${{ github.event.ref }} || true
+          sops --decrypt --in-place manifests/secret.enc.yaml
+          kustomize edit set namespace ${{ github.event.ref }}
+          kubectl config set-context --current --namespace=${{ github.event.ref }}
+          #kustomize edit set image jammeri/project=gcr.io/$PROJECT_ID/$IMAGE:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+          #kustomize edit set image jammeri/backend=gcr.io/$PROJECT_ID/$IMAGE-backend:${GITHUB_REF#refs/heads/}-$GITHUB_SHA
+          kustomize build . | kubectl delete -f -
+          #kubectl rollout status deployment $IMAGE-dep
+          #kubectl get services -o wide
