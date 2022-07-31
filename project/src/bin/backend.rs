@@ -33,7 +33,7 @@ async fn get_todos_db(server: &String) -> Result<Vec<String>,Error> {
 
 async fn post_todos_db(server: &String, todo: &String) -> Result<(),Error> {
   let (client, connection) = tokio_postgres::connect(&server, NoTls).await?;
-
+  println!("Posting todo: {}", todo);
   tokio::spawn(async move {
     if let Err(e) = connection.await {
       eprintln!("connection error: {}", e);
@@ -44,6 +44,7 @@ async fn post_todos_db(server: &String, todo: &String) -> Result<(),Error> {
   client.batch_execute(query).await?;
 
   client.execute("INSERT INTO todos (task) VALUES ($1)",&[todo]).await?;
+  println!("Todo added: {}", todo);
   Ok(())
 }
 

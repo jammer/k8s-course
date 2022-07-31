@@ -19,6 +19,13 @@ spec:
       containers:
         - name: backend
           image: IMAGEBACKEND
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "100Mi"
+            limits:
+              cpu: "500m"
+              memory: "500Mi"
           env:
            - name: SERVER
              valueFrom:
@@ -27,6 +34,13 @@ spec:
                  key: server
         - name: web
           image: IMAGEFRONTEND
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "100Mi"
+            limits:
+              cpu: "500m"
+              memory: "500Mi"
           volumeMounts:
             - name: data
               mountPath: /data
