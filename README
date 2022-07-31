@@ -1,0 +1,10 @@
+My exercises for course: DevOps with Kubernetes 
+
+Exercise 3.06: DBaaS vs DIY
+
+Deploying Google's SQL seems really easy by just filling some forms. On the downside Google SQL requires you to have a SQL instance thus having some cloud instances only doing SQL work. While deploying Kubernette instance required some configuration it was not particularly hard either. Kubernettes allow me to fully utilize my cloud instances and run other pods in the SQL instance. In the DIY solution having the SQL data stored in the kubernettes feels bit scary as a new user since it's so easy to destroy. Google SQL offers automatic backups that would require some effort on the DIY solution for example doing periodic SQL dump or possibly using Snapshots for the volume, but feels like later contains more risks since it's binary formated data. Deploying read only replicas of the database seems much easier with the cloud solution. I have no experience scaling Postgres so if I had need for better scaling using the Cloud SQL could be an easy option.
+
+Exercise 3.07: Commitment
+
+I was already using Postgres with PeristentVolumeClaim so going to stick with it because switching would require more work.
+
